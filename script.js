@@ -452,40 +452,76 @@ function initTheme() {
 
 function toggleTheme(e) {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  spawnRipple(e.clientX, e.clientY);
-  setTimeout(() => setTheme(isDark ? 'light' : 'dark', true), 80);
+  const nextTheme = isDark ? 'light' : 'dark';
+
+  const x = e?.clientX ?? window.innerWidth / 2;
+  const y = e?.clientY ?? window.innerHeight / 2;
+
+  spawnRipple(x, y, nextTheme);
+  document.body.classList.add('theme-switching');
+
+  setTimeout(() => {
+    setTheme(nextTheme, true);
+    requestAnimationFrame(() => {
+      document.body.classList.remove('theme-switching');
+    });
+  }, 120);
 }
 
 function setTheme(theme, animate) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('sjl-theme', theme);
+  updateToggleUI();
+
   if (animate) {
-    document.querySelectorAll('.theme-icon').forEach(ic => {
+    document.querySelectorAll('.theme-icon, .btn-theme-mini').forEach(ic => {
       ic.classList.remove('spin');
+      ic.classList.remove('theme-pop');
       void ic.offsetWidth;
-      ic.classList.add('spin');
-      setTimeout(() => ic.classList.remove('spin'), 600);
+      ic.classList.add('spin', 'theme-pop');
+      setTimeout(() => {
+        ic.classList.remove('spin');
+        ic.classList.remove('theme-pop');
+      }, 650);
     });
   }
-  updateToggleUI();
 }
 
 function updateToggleUI() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const sun  = '☀️';
   const moon = '🌙';
-  document.querySelectorAll('.theme-icon').forEach(el => el.textContent = isDark ? sun : moon);
-  document.querySelectorAll('.theme-label').forEach(el => el.textContent = isDark ? 'Svetlý' : 'Tmavý');
-  document.querySelectorAll('.btn-theme-mini').forEach(el => el.textContent = isDark ? sun : moon);
+
+  document.querySelectorAll('.theme-icon').forEach(el => {
+    el.textContent = isDark ? moon : sun;
+    el.setAttribute('aria-hidden', 'true');
+  });
+
+  document.querySelectorAll('.theme-label').forEach(el => {
+    el.textContent = isDark ? 'Tmavý režim' : 'Svetlý režim';
+  });
+
+  document.querySelectorAll('.btn-theme-mini').forEach(el => {
+    el.textContent = isDark ? moon : sun;
+    el.setAttribute('aria-label', isDark ? 'Prepnúť na svetlý režim' : 'Prepnúť na tmavý režim');
+    el.title = isDark ? 'Prepnúť na svetlý režim' : 'Prepnúť na tmavý režim';
+  });
+
+  const mainToggle = document.getElementById('btn-theme');
+  if (mainToggle) {
+    mainToggle.setAttribute('aria-label', isDark ? 'Aktívny tmavý režim' : 'Aktívny svetlý režim');
+    mainToggle.title = isDark ? 'Aktívny tmavý režim' : 'Aktívny svetlý režim';
+  }
 }
 
-function spawnRipple(x, y) {
+function spawnRipple(x, y, nextTheme) {
   const r = document.createElement('div');
   r.className = 'ripple';
+  r.dataset.theme = nextTheme;
   r.style.left = x + 'px';
   r.style.top  = y + 'px';
   document.body.appendChild(r);
-  setTimeout(() => r.remove(), 700);
+  setTimeout(() => r.remove(), 900);
 }
 
 init();

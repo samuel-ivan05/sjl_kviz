@@ -54,7 +54,10 @@
 
 /* ── Plynulý prechod pri prepnutí ── */
 html {
-  transition: background-color .4s ease;
+  transition:
+    background-color .55s ease,
+    color .55s ease;
+  scroll-behavior: smooth;
 }
 
 *, *::before, *::after {
@@ -79,6 +82,11 @@ body {
   font-family: Georgia, "Times New Roman", serif;
   color: var(--text);
   min-height: 100vh;
+  transition:
+    background .55s ease,
+    color .45s ease,
+    opacity .25s ease,
+    filter .35s ease;
 }
 
 [data-theme="light"] body {
@@ -141,12 +149,19 @@ body {
 
 .btn-theme:hover {
   border-color: var(--navy);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0,0,0,.08);
 }
 
 .theme-icon {
   font-size: 1.15rem;
   display: inline-block;
-  transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+  line-height: 1;
+  transition:
+    transform .5s cubic-bezier(.34,1.56,.64,1),
+    opacity .22s ease,
+    filter .3s ease;
+  will-change: transform, opacity;
 }
 
 /* Track */
@@ -183,6 +198,22 @@ body {
   transform: rotate(360deg);
 }
 
+
+.theme-pop {
+  animation: theme-pop .65s cubic-bezier(.34,1.56,.64,1);
+}
+
+body.theme-switching {
+  opacity: .985;
+  filter: saturate(1.02);
+}
+
+@keyframes theme-pop {
+  0%   { transform: scale(.82); opacity: .65; }
+  45%  { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 /* Mini toggle pre quiz */
 .quiz-topbar-right {
   display: flex;
@@ -199,7 +230,12 @@ body {
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition: transform .3s ease, border-color .2s ease !important;
+  line-height: 1;
+  transition:
+    transform .35s cubic-bezier(.34,1.56,.64,1),
+    border-color .25s ease,
+    background-color .35s ease,
+    opacity .2s ease !important;
 }
 
 .btn-theme-mini:hover {
@@ -217,16 +253,18 @@ body {
   position: fixed;
   pointer-events: none;
   border-radius: 50%;
-  width: 100px; height: 100px;
-  animation: ripple-anim .65s ease-out forwards;
+  width: 140px;
+  height: 140px;
+  animation: ripple-anim .82s cubic-bezier(.22,1,.36,1) forwards;
   z-index: 9999;
 }
 
-[data-theme="dark"] .ripple {
-  background: radial-gradient(circle, rgba(91,142,248,.4), transparent 65%);
+.ripple[data-theme="dark"] {
+  background: radial-gradient(circle, rgba(91,142,248,.42), transparent 68%);
 }
-[data-theme="light"] .ripple {
-  background: radial-gradient(circle, rgba(201,155,65,.35), transparent 65%);
+
+.ripple[data-theme="light"] {
+  background: radial-gradient(circle, rgba(201,155,65,.32), transparent 68%);
 }
 
 /* ── Headings ── */
