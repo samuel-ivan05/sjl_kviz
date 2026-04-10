@@ -441,20 +441,19 @@ function esc(s) {
 }
 
 // ── Init ──────────────────────────────────────────────────────
-init();
 
-// ══ DARK / LIGHT MODE ════════════════════════════════════════
+// ── Dark / Light mode ─────────────────────────────
 function initTheme() {
   const saved = localStorage.getItem('sjl-theme');
   setTheme(saved || 'dark', false);
-  document.getElementById('btn-theme').addEventListener('click', e => toggleTheme(e));
-  document.getElementById('btn-theme-quiz').addEventListener('click', e => toggleTheme(e));
+  document.getElementById('btn-theme').addEventListener('click', toggleTheme);
+  document.getElementById('btn-theme-quiz').addEventListener('click', toggleTheme);
 }
 
 function toggleTheme(e) {
-  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   spawnRipple(e.clientX, e.clientY);
-  setTimeout(() => setTheme(next, true), 80);
+  setTimeout(() => setTheme(isDark ? 'light' : 'dark', true), 80);
 }
 
 function setTheme(theme, animate) {
@@ -473,11 +472,11 @@ function setTheme(theme, animate) {
 
 function updateToggleUI() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const sunIcon  = '\u2600\ufe0f';
-  const moonIcon = '\U0001f319';
-  document.querySelectorAll('.theme-icon').forEach(el => el.textContent = isDark ? sunIcon : moonIcon);
-  document.querySelectorAll('.theme-label').forEach(el => el.textContent = isDark ? 'Svetl\u00fd' : 'Tmav\u00fd');
-  document.querySelectorAll('.btn-theme-mini').forEach(el => el.textContent = isDark ? sunIcon : moonIcon);
+  const sun  = '☀️';
+  const moon = '🌙';
+  document.querySelectorAll('.theme-icon').forEach(el => el.textContent = isDark ? sun : moon);
+  document.querySelectorAll('.theme-label').forEach(el => el.textContent = isDark ? 'Svetlý' : 'Tmavý');
+  document.querySelectorAll('.btn-theme-mini').forEach(el => el.textContent = isDark ? sun : moon);
 }
 
 function spawnRipple(x, y) {
@@ -489,6 +488,4 @@ function spawnRipple(x, y) {
   setTimeout(() => r.remove(), 700);
 }
 
-
-// ── Init ──────
 init();
