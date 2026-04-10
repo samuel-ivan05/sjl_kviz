@@ -13,12 +13,12 @@
 
 // ── Stav ─────────────────────────────────────────────────────
 const state = {
-  themes:      [],   // zoznam tém z themes.json
-  themeId:     null, // vybraná téma
-  count:       10,   // vybraný počet otázok
-  questions:   [],   // načítané otázky aktuálnej témy
-  quiz:        [],   // premiešaný výber otázok
-  idx:         0,    // aktuálna otázka
+  themes:      [],
+  themeId:     null,
+  count:       10,
+  questions:   [],
+  quiz:        [],
+  idx:         0,
   score:       0,
   answered:    false,
 };
@@ -26,7 +26,11 @@ const state = {
 // ── DOM ───────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
-const screens = { intro: $('s-intro'), quiz: $('s-quiz'), result: $('s-result') };
+const screens = {
+  intro: $('s-intro'),
+  quiz: $('s-quiz'),
+  result: $('s-result')
+};
 
 // ── Štart ─────────────────────────────────────────────────────
 async function init() {
@@ -44,23 +48,27 @@ async function loadThemes() {
     state.themes = await res.json();
     renderThemeGrid();
   } catch (e) {
-    $('theme-grid').innerHTML = '<p class="loading-msg" style="color:#ad3b3b">Chyba pri načítaní tém.</p>';
+    $('theme-grid').innerHTML =
+      '<p class="loading-msg" style="color:#ad3b3b">Chyba pri načítaní tém.</p>';
   }
 }
 
 function renderThemeGrid() {
   const grid = $('theme-grid');
   grid.innerHTML = '';
+
   state.themes.forEach(t => {
     const btn = document.createElement('button');
     btn.className = 't-btn';
     btn.dataset.id = t.themeId;
+    btn.type = 'button';
     btn.innerHTML = `
       <span class="t-num">${t.themeId}</span>
       <span>
         <strong class="t-name">${t.themeName}</strong>
         <span class="t-meta">${t.questionCount} otázok</span>
       </span>`;
+
     btn.addEventListener('click', () => selectTheme(t, btn));
     grid.appendChild(btn);
   });
@@ -71,18 +79,17 @@ function selectTheme(t, btn) {
   document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('sel'));
   btn.classList.add('sel');
   state.themeId = t.themeId;
-  state.questions = [];          // vymaž predchádzajúci cache
+  state.questions = [];
 
   $('theme-info').textContent = `${t.themeName} · ${t.questionCount} otázok`;
   $('btn-start').disabled = false;
 
-  // Dim count buttons that exceed available questions
   document.querySelectorAll('.count-btn').forEach(b => {
     const n = +b.dataset.n;
     const tooMany = n > t.questionCount;
     b.classList.toggle('dim', tooMany);
     b.title = tooMany ? `Téma má len ${t.questionCount} otázok` : '';
-    // Ak aktívny count je príliš veľký, resetni na 10
+
     if (tooMany && b.classList.contains('active')) {
       b.classList.remove('active');
       document.querySelector('[data-n="10"]').classList.add('active');
@@ -113,7 +120,6 @@ async function startQuiz() {
   $('btn-start').textContent = 'Načítavam…';
 
   try {
-    // Načítaj otázky len ak ešte nie sú v cache
     if (!state.questions.length) {
       const res = await fetch(`data/tema-${state.themeId}.json`);
       state.questions = await res.json();
@@ -126,15 +132,15 @@ async function startQuiz() {
   }
 
   const actualCount = Math.min(state.count, state.questions.length);
-  state.quiz    = shuffle([...state.questions]).slice(0, actualCount).map(prepareQuestion);
-  state.idx     = 0;
-  state.score   = 0;
+  state.quiz = shuffle([...state.questions]).slice(0, actualCount).map(prepareQuestion);
+  state.idx = 0;
+  state.score = 0;
   state.answered = false;
 
   const theme = state.themes.find(t => t.themeId === state.themeId);
   $('lbl-theme').textContent = theme.themeName;
-  $('btn-next').textContent  = 'Ďalšia otázka →';
-  $('btn-start').disabled    = false;
+  $('btn-next').textContent = 'Ďalšia otázka →';
+  $('btn-start').disabled = false;
   $('btn-start').textContent = 'Začať kvíz';
 
   showScreen('quiz');
@@ -144,7 +150,7 @@ async function startQuiz() {
 // ── Quiz bindery ──────────────────────────────────────────────
 function bindQuiz() {
   $('btn-verify').addEventListener('click', verifyAnswer);
-  $('btn-next').addEventListener('click',   nextQuestion);
+  $('btn-next').addEventListener('click', nextQuestion);
   $('btn-back').addEventListener('click', () => {
     if (confirm('Naozaj chceš ukončiť kvíz? Postup sa neuloží.')) goHome();
   });
@@ -153,13 +159,13 @@ function bindQuiz() {
 // ── Render otázky ─────────────────────────────────────────────
 function renderQuestion() {
   state.answered = false;
-  const q     = state.quiz[state.idx];
+  const q = state.quiz[state.idx];
   const total = state.quiz.length;
 
-  $('lbl-qnum').textContent     = `Otázka ${state.idx + 1} z ${total}`;
-  $('lbl-score').textContent    = state.score;
-  $('progress').style.width     = `${(state.idx / total) * 100}%`;
-  $('q-text').textContent       = q.question;
+  $('lbl-qnum').textContent = `Otázka ${state.idx + 1} z ${total}`;
+  $('lbl-score').textContent = state.score;
+  $('progress').style.width = `${(state.idx / total) * 100}%`;
+  $('q-text').textContent = q.question;
 
   $('feedback').classList.add('hidden');
   $('fb-exp').classList.add('hidden');
@@ -171,32 +177,37 @@ function renderQuestion() {
   body.innerHTML = '';
 
   const render = {
-    single:    renderSingle,
+    single: renderSingle,
     truefalse: renderTrueFalse,
-    multiple:  renderMultiple,
-    fill:      renderFill,
-    matching:  renderMatching,
+    multiple: renderMultiple,
+    fill: renderFill,
+    matching: renderMatching,
   };
 
   (render[q.type] || renderSingle)(q, body);
 }
 
 // ── Renderers ─────────────────────────────────────────────────
-const LTRS = ['A','B','C','D','E','F'];
+const LTRS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 function renderSingle(q, body) {
   const list = el('div', 'opt-list');
+
   shuffle(q.options || []).forEach((opt, i) => {
     const btn = el('button', 'opt-btn');
+    btn.type = 'button';
     btn.dataset.v = opt;
     btn.innerHTML = `<span class="opt-ltr">${LTRS[i] || '?'}</span>${opt}`;
+
     btn.addEventListener('click', () => {
       if (state.answered) return;
       list.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('sel'));
       btn.classList.add('sel');
     });
+
     list.appendChild(btn);
   });
+
   body.appendChild(list);
 }
 
@@ -207,15 +218,20 @@ function renderTrueFalse(q, body) {
 function renderMultiple(q, body) {
   body.appendChild(hint('Vyber všetky správne odpovede'));
   const list = el('div', 'multi-list');
+
   shuffle(q.options || []).forEach(opt => {
     const lbl = el('label', 'multi-item');
     lbl.dataset.v = opt;
+
     const cb = document.createElement('input');
-    cb.type = 'checkbox'; cb.value = opt;
+    cb.type = 'checkbox';
+    cb.value = opt;
+
     lbl.appendChild(cb);
     lbl.appendChild(document.createTextNode(opt));
     list.appendChild(lbl);
   });
+
   body.appendChild(list);
 }
 
@@ -223,44 +239,53 @@ function renderFill(q, body) {
   const inp = el('input', 'fill-input');
   inp.id = 'fill-inp';
   inp.placeholder = 'Napíš svoju odpoveď…';
-  inp.addEventListener('keydown', e => { if (e.key === 'Enter') verifyAnswer(); });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') verifyAnswer();
+  });
   body.appendChild(inp);
 }
 
 function renderMatching(q, body) {
   body.appendChild(hint('Priraď každý pojem k správnemu vysvetleniu'));
-  const opts  = shuffle((q.pairs || []).map(p => p.match));
-  const list  = el('div', 'match-list');
+  const opts = shuffle((q.pairs || []).map(p => p.match));
+  const list = el('div', 'match-list');
+
   (q.pairs || []).forEach(pair => {
-    const row  = el('div', 'match-row');
+    const row = el('div', 'match-row');
     const term = el('div', 'match-term');
     term.textContent = pair.term;
+
     const sel = el('select', 'match-sel');
     sel.dataset.term = pair.term;
-    sel.innerHTML = '<option value="">— vyber —</option>' +
+    sel.innerHTML =
+      '<option value="">— vyber —</option>' +
       opts.map(o => `<option value="${esc(o)}">${o}</option>`).join('');
+
     row.append(term, sel);
     list.appendChild(row);
   });
+
   body.appendChild(list);
 }
 
 // ── Overenie ──────────────────────────────────────────────────
 function verifyAnswer() {
   if (state.answered) return;
+
   const q = state.quiz[state.idx];
   const map = {
-    single:    verifySingle,
+    single: verifySingle,
     truefalse: verifySingle,
-    multiple:  verifyMultiple,
-    fill:      verifyFill,
-    matching:  verifyMatching,
+    multiple: verifyMultiple,
+    fill: verifyFill,
+    matching: verifyMatching,
   };
+
   const fn = map[q.type];
   if (!fn) return;
 
   const ok = fn(q);
-  if (ok === null) return;   // needAnswer – nevyhodnocuj
+  if (ok === null) return;
 
   state.answered = true;
   if (ok) state.score++;
@@ -269,71 +294,97 @@ function verifyAnswer() {
   showFeedback(q, ok);
   $('btn-verify').classList.add('hidden');
   $('btn-next').classList.remove('hidden');
-  if (state.idx === state.quiz.length - 1)
+
+  if (state.idx === state.quiz.length - 1) {
     $('btn-next').textContent = 'Zobraziť výsledok →';
+  }
 }
 
 function verifySingle(q) {
   const sel = document.querySelector('.opt-btn.sel');
   if (!sel) return needAnswer();
+
   document.querySelectorAll('.opt-btn').forEach(btn => {
     btn.disabled = true;
     if (btn.dataset.v === q.correctAnswer) btn.classList.add('ok');
     else if (btn.classList.contains('sel')) btn.classList.add('bad');
   });
+
   setCorrectAnswer(q.correctAnswer);
   return sel.dataset.v === q.correctAnswer;
 }
 
 function verifyMultiple(q) {
-  const items   = [...document.querySelectorAll('.multi-item')];
-  const checked = items.filter(i => i.querySelector('input').checked).map(i => i.dataset.v);
+  const items = [...document.querySelectorAll('.multi-item')];
+  const checked = items
+    .filter(i => i.querySelector('input').checked)
+    .map(i => i.dataset.v);
+
   if (!checked.length) return needAnswer();
+
   items.forEach(it => {
     it.querySelector('input').disabled = true;
     const v = it.dataset.v;
     const isOk = q.correctAnswer.includes(v);
     const isOn = checked.includes(v);
-    if (isOk && isOn)   it.classList.add('ok');
+
+    if (isOk && isOn) it.classList.add('ok');
     else if (!isOk && isOn) it.classList.add('bad');
     else if (isOk && !isOn) it.classList.add('miss');
   });
+
   setCorrectAnswer(q.correctAnswer.join(', '));
-  return checked.length === q.correctAnswer.length && q.correctAnswer.every(x => checked.includes(x));
+  return checked.length === q.correctAnswer.length &&
+         q.correctAnswer.every(x => checked.includes(x));
 }
 
 function verifyFill(q) {
   const inp = $('fill-inp');
   if (!inp || !inp.value.trim()) return needAnswer();
+
   const user = norm(inp.value);
   const answers = (Array.isArray(q.correctAnswer) ? q.correctAnswer : [q.correctAnswer]).map(norm);
   const ok = answers.includes(user);
+
   inp.disabled = true;
   inp.classList.add(ok ? 'ok' : 'bad');
   setCorrectAnswer(Array.isArray(q.correctAnswer) ? q.correctAnswer[0] : q.correctAnswer);
+
   return ok;
 }
 
 function verifyMatching(q) {
   const sels = [...document.querySelectorAll('.match-sel')];
   if (sels.some(s => !s.value)) return needAnswer();
+
   let ok = true;
+
   sels.forEach(sel => {
     sel.disabled = true;
-    if (sel.value === q.correctAnswer[sel.dataset.term]) sel.classList.add('ok');
-    else { sel.classList.add('bad'); ok = false; }
+    if (sel.value === q.correctAnswer[sel.dataset.term]) {
+      sel.classList.add('ok');
+    } else {
+      sel.classList.add('bad');
+      ok = false;
+    }
   });
+
   setCorrectAnswer((q.pairs || []).map(p => `${p.term} → ${p.match}`).join(' | '));
   return ok;
 }
 
 function needAnswer() {
   const box = $('fb-box');
-  const fb  = $('feedback');
+  const fb = $('feedback');
+
   box.className = 'fb-box fb-bad';
   box.textContent = 'Najprv odpovedz na otázku.';
   fb.classList.remove('hidden');
-  setTimeout(() => { if (!state.answered) fb.classList.add('hidden'); }, 1800);
+
+  setTimeout(() => {
+    if (!state.answered) fb.classList.add('hidden');
+  }, 1800);
+
   return null;
 }
 
@@ -364,37 +415,53 @@ function nextQuestion() {
 
 function showResult() {
   const total = state.quiz.length;
-  const pct   = Math.round((state.score / total) * 100);
+  const pct = Math.round((state.score / total) * 100);
+
   $('r-score').textContent = `${state.score} / ${total}`;
-  $('r-pct').textContent   = `${pct} %`;
-  $('r-text').textContent  =
+  $('r-pct').textContent = `${pct} %`;
+  $('r-text').textContent =
     pct >= 90 ? 'Toto nebol výkrik do tmy, pekne!' :
     pct >= 75 ? 'Lajdačina' :
-    pct >= 55 ? 'No, to je smutné.' : 'Bože. Daj mi silu';
-  $('r-icon').textContent  =
-    pct >= 90 ? '🔥🏆🔥' : pct >= 75 ? '👍👍👍' : pct >= 55 ? '💀' : '👨🏻‍🦯‍➡️🕳️💀⚰️';
+    pct >= 55 ? 'No, to je smutné.' :
+    'Bože. Daj mi silu';
+
+  $('r-icon').textContent =
+    pct >= 90 ? '🔥🏆🔥' :
+    pct >= 75 ? '👍👍👍' :
+    pct >= 55 ? '💀' :
+    '👨🏻‍🦯‍➡️🕳️💀⚰️';
+
   $('r-bar').style.width = '0';
   showScreen('result');
-  setTimeout(() => { $('r-bar').style.width = `${pct}%`; }, 120);
+
+  setTimeout(() => {
+    $('r-bar').style.width = `${pct}%`;
+  }, 120);
 }
 
 // ── Result bindery ────────────────────────────────────────────
 function bindResult() {
   $('btn-retry').addEventListener('click', () => startQuiz());
-  $('btn-home').addEventListener('click',  () => goHome());
+  $('btn-home').addEventListener('click', () => goHome());
 }
 
 function goHome() {
   state.themeId = null;
   document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('sel'));
-  document.querySelectorAll('.count-btn').forEach(b => { b.classList.remove('dim'); b.title = ''; });
+  document.querySelectorAll('.count-btn').forEach(b => {
+    b.classList.remove('dim');
+    b.title = '';
+  });
+
   $('theme-info').textContent = '—';
   $('btn-start').disabled = true;
   showScreen('intro');
 }
 
 function showScreen(name) {
-  Object.entries(screens).forEach(([k, el]) => el.classList.toggle('active', k === name));
+  Object.entries(screens).forEach(([k, el]) => {
+    el.classList.toggle('active', k === name);
+  });
 }
 
 // ── Pomocné funkcie ───────────────────────────────────────────
@@ -433,21 +500,38 @@ function shuffle(arr) {
 }
 
 function norm(s) {
-  return s.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return s
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
 
 function esc(s) {
-  return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+  return String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }
-
-// ── Init ──────────────────────────────────────────────────────
 
 // ── Dark / Light mode ─────────────────────────────
 function initTheme() {
+  ensureThemeFade();
+
   const saved = localStorage.getItem('sjl-theme');
   setTheme(saved || 'dark', false);
-  document.getElementById('btn-theme').addEventListener('click', toggleTheme);
-  document.getElementById('btn-theme-quiz').addEventListener('click', toggleTheme);
+
+  $('btn-theme').addEventListener('click', toggleTheme);
+  $('btn-theme-quiz').addEventListener('click', toggleTheme);
+}
+
+function ensureThemeFade() {
+  if (document.querySelector('.theme-fade')) return;
+
+  const fade = document.createElement('div');
+  fade.className = 'theme-fade';
+  document.body.appendChild(fade);
 }
 
 function toggleTheme(e) {
@@ -457,15 +541,24 @@ function toggleTheme(e) {
   const x = e?.clientX ?? window.innerWidth / 2;
   const y = e?.clientY ?? window.innerHeight / 2;
 
-  spawnRipple(x, y, nextTheme);
-  document.body.classList.add('theme-switching');
+  animateThemeIcons();
+  spawnRipple(x, y);
+
+  const fade = document.querySelector('.theme-fade');
+  if (!fade) {
+    setTheme(nextTheme, true);
+    return;
+  }
+
+  fade.classList.add('show');
 
   setTimeout(() => {
     setTheme(nextTheme, true);
-    requestAnimationFrame(() => {
-      document.body.classList.remove('theme-switching');
-    });
-  }, 120);
+  }, 160);
+
+  setTimeout(() => {
+    fade.classList.remove('show');
+  }, 260);
 }
 
 function setTheme(theme, animate) {
@@ -474,54 +567,52 @@ function setTheme(theme, animate) {
   updateToggleUI();
 
   if (animate) {
-    document.querySelectorAll('.theme-icon, .btn-theme-mini').forEach(ic => {
+    document.querySelectorAll('.theme-icon').forEach(ic => {
       ic.classList.remove('spin');
-      ic.classList.remove('theme-pop');
       void ic.offsetWidth;
-      ic.classList.add('spin', 'theme-pop');
-      setTimeout(() => {
-        ic.classList.remove('spin');
-        ic.classList.remove('theme-pop');
-      }, 650);
+      ic.classList.add('spin');
+      setTimeout(() => ic.classList.remove('spin'), 600);
     });
   }
 }
 
+function animateThemeIcons() {
+  document.querySelectorAll('.theme-icon, .btn-theme-mini').forEach(el => {
+    el.classList.remove('switching');
+    void el.offsetWidth;
+    el.classList.add('switching');
+    setTimeout(() => el.classList.remove('switching'), 260);
+  });
+}
+
 function updateToggleUI() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const sun  = '☀️';
+  const sun = '☀️';
   const moon = '🌙';
 
   document.querySelectorAll('.theme-icon').forEach(el => {
     el.textContent = isDark ? moon : sun;
-    el.setAttribute('aria-hidden', 'true');
+  });
+
+  document.querySelectorAll('.btn-theme-mini').forEach(el => {
+    el.textContent = isDark ? moon : sun;
   });
 
   document.querySelectorAll('.theme-label').forEach(el => {
     el.textContent = isDark ? 'Tmavý režim' : 'Svetlý režim';
   });
-
-  document.querySelectorAll('.btn-theme-mini').forEach(el => {
-    el.textContent = isDark ? moon : sun;
-    el.setAttribute('aria-label', isDark ? 'Prepnúť na svetlý režim' : 'Prepnúť na tmavý režim');
-    el.title = isDark ? 'Prepnúť na svetlý režim' : 'Prepnúť na tmavý režim';
-  });
-
-  const mainToggle = document.getElementById('btn-theme');
-  if (mainToggle) {
-    mainToggle.setAttribute('aria-label', isDark ? 'Aktívny tmavý režim' : 'Aktívny svetlý režim');
-    mainToggle.title = isDark ? 'Aktívny tmavý režim' : 'Aktívny svetlý režim';
-  }
 }
 
-function spawnRipple(x, y, nextTheme) {
+function spawnRipple(x, y) {
   const r = document.createElement('div');
   r.className = 'ripple';
-  r.dataset.theme = nextTheme;
-  r.style.left = x + 'px';
-  r.style.top  = y + 'px';
+  r.style.left = `${x}px`;
+  r.style.top = `${y}px`;
   document.body.appendChild(r);
-  setTimeout(() => r.remove(), 900);
+
+  setTimeout(() => {
+    r.remove();
+  }, 800);
 }
 
 init();

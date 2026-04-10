@@ -13,56 +13,66 @@
     <div class="card">
       <div class="top-bar">
         <div class="badge">SJL</div>
-        <button id="btn-theme" class="btn-theme" title="Aktívny tmavý režim" aria-label="Aktívny tmavý režim">
-          <span class="theme-icon">☀️</span>
+        <button id="btn-theme" class="btn-theme" title="Prepnúť režim" type="button">
+          <span class="theme-icon">🌙</span>
           <span class="theme-track"><span class="theme-thumb"></span></span>
-          <span class="theme-label">Svetlý</span>
+          <span class="theme-label">Tmavý režim</span>
         </button>
       </div>
       <h1>Kvíz zo slovenského jazyka</h1>
       <p class="sub">Slovenský jazyk a literatúra</p>
       <p class="desc">Vyber si tému a počet otázok – načíta sa len vybraná téma :3</p>
+
       <div class="row-label">
         <span class="label">Vyber tému</span>
         <span id="theme-info" class="theme-info">—</span>
       </div>
+
       <div id="theme-grid" class="theme-grid">
         <p class="loading-msg">Načítavam témy…</p>
       </div>
+
       <span class="label" style="display:block;margin-top:1.8rem">Počet otázok</span>
       <div class="count-row" id="count-row">
-        <button class="count-btn active" data-n="10">10</button>
-        <button class="count-btn" data-n="20">20</button>
-        <button class="count-btn" data-n="30">30</button>
+        <button class="count-btn active" data-n="10" type="button">10</button>
+        <button class="count-btn" data-n="20" type="button">20</button>
+        <button class="count-btn" data-n="30" type="button">30</button>
       </div>
-      <button id="btn-start" class="btn-pri btn-start" disabled>Začať kvíz</button>
+
+      <button id="btn-start" class="btn-pri btn-start" disabled type="button">Začať kvíz</button>
     </div>
   </div>
 
   <div id="s-quiz" class="screen">
     <div class="card quiz-card">
       <div class="quiz-topbar">
-        <button id="btn-back" class="btn-back">← Späť</button>
+        <button id="btn-back" class="btn-back" type="button">← Späť</button>
+
         <div class="quiz-topbar-right">
           <div class="score-pill">Skóre: <strong id="lbl-score">0</strong></div>
-          <button id="btn-theme-quiz" class="btn-theme-mini" title="Prepnúť na svetlý režim" aria-label="Prepnúť na svetlý režim">☀️</button>
+          <button id="btn-theme-quiz" class="btn-theme-mini" title="Prepnúť režim" type="button">🌙</button>
         </div>
       </div>
+
       <div class="quiz-meta-row">
         <span id="lbl-theme" class="tag"></span>
         <span id="lbl-qnum" class="qnum"></span>
       </div>
+
       <div class="progress-wrap"><div id="progress" class="progress-bar"></div></div>
+
       <p id="q-text" class="q-text"></p>
       <div id="q-body"></div>
+
       <div id="feedback" class="feedback hidden">
         <div id="fb-box" class="fb-box"></div>
         <div id="fb-exp" class="fb-exp hidden"></div>
         <div id="fb-ans" class="fb-ans hidden"></div>
       </div>
+
       <div class="quiz-actions">
-        <button id="btn-verify" class="btn-pri">Overiť odpoveď</button>
-        <button id="btn-next"   class="btn-pri hidden">Ďalšia otázka →</button>
+        <button id="btn-verify" class="btn-pri" type="button">Overiť odpoveď</button>
+        <button id="btn-next" class="btn-pri hidden" type="button">Ďalšia otázka →</button>
       </div>
     </div>
   </div>
@@ -72,17 +82,19 @@
       <div id="r-icon" class="r-icon"></div>
       <h2 class="r-title">Výsledok</h2>
       <div id="r-score" class="r-score"></div>
-      <div id="r-pct"   class="r-pct"></div>
-      <div id="r-text"  class="r-text"></div>
+      <div id="r-pct" class="r-pct"></div>
+      <div id="r-text" class="r-text"></div>
       <div class="bar-wrap"><div id="r-bar" class="r-bar"></div></div>
+
       <div class="result-actions">
-        <button id="btn-retry" class="btn-pri">Opakovať</button>
-        <button id="btn-home"  class="btn-sec">Späť na úvod</button>
+        <button id="btn-retry" class="btn-pri" type="button">Opakovať</button>
+        <button id="btn-home" class="btn-sec" type="button">Späť na úvod</button>
       </div>
     </div>
   </div>
 
 </div>
+
 <script src="script.js"></script>
 </body>
 </html>
