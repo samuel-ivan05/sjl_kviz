@@ -125,7 +125,7 @@ async function startQuiz() {
   }
 
   const actualCount = Math.min(state.count, state.questions.length);
-  state.quiz    = shuffle([...state.questions]).slice(0, actualCount);
+  state.quiz    = shuffle([...state.questions]).slice(0, actualCount).map(prepareQuestion);
   state.idx     = 0;
   state.score   = 0;
   state.answered = false;
@@ -407,6 +407,20 @@ function hint(text) {
   const p = el('p', 'hint');
   p.textContent = text;
   return p;
+}
+
+function prepareQuestion(q) {
+  const copy = structuredClone(q);
+
+  if (Array.isArray(copy.options) && ['single', 'multiple', 'truefalse'].includes(copy.type)) {
+    copy.options = shuffle([...copy.options]);
+  }
+
+  if (Array.isArray(copy.pairs) && copy.type === 'matching') {
+    copy.pairs = shuffle([...copy.pairs]);
+  }
+
+  return copy;
 }
 
 function shuffle(arr) {
