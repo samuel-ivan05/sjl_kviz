@@ -185,7 +185,7 @@ const LTRS = ['A','B','C','D','E','F'];
 
 function renderSingle(q, body) {
   const list = el('div', 'opt-list');
-  (q.options || []).forEach((opt, i) => {
+  shuffle(q.options || []).forEach((opt, i) => {
     const btn = el('button', 'opt-btn');
     btn.dataset.v = opt;
     btn.innerHTML = `<span class="opt-ltr">${LTRS[i] || '?'}</span>${opt}`;
@@ -206,7 +206,7 @@ function renderTrueFalse(q, body) {
 function renderMultiple(q, body) {
   body.appendChild(hint('Vyber všetky správne odpovede'));
   const list = el('div', 'multi-list');
-  (q.options || []).forEach(opt => {
+  shuffle(q.options || []).forEach(opt => {
     const lbl = el('label', 'multi-item');
     lbl.dataset.v = opt;
     const cb = document.createElement('input');
